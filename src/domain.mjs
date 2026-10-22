@@ -38,7 +38,7 @@ export async function seed(now=new Date()) {
   const id=`CT-${String(w.id*100+j+1).padStart(4,'0')}`,age=3+j*2;
   const status=j<(10-Math.floor(w.id/2))?'Closed':j===10?'Awaiting verification':j===11?'Reported':'In progress';
   const createdAt=new Date(+now-age*86400000).toISOString();const fixedAt=new Date(+now-(age-2)*86400000).toISOString();const closedAt=status==='Closed'?new Date(+now-(age-3)*86400000).toISOString():null;
-  const c={id,title:titles[(j+w.id)%titles.length],description:'A resident reported this issue near a busy neighborhood route. Please inspect the location and make the area safe for pedestrians.',category:CATEGORIES[(j+w.id)%5],ward:w.id,lat:w.lat+(j%3-1)*.0004,lng:w.lng+(j%2)*.0003,reporter:'resident',createdAt,status,photo:null,simulated:true,round:1,votes:status==='Closed'?[{actor:'arjun',confirmed:true},{actor:'sana',confirmed:true}]:[],fixNote:status==='Closed'||status==='Awaiting verification'?'Repair completed and area cleared. Ready for a neighborhood check.':'',fixPhoto:null,fixedAt:status==='Closed'||status==='Awaiting verification'?fixedAt:null,closedAt};
+  const c={id,title:titles[(j+w.id)%titles.length],description:'A resident reported this issue near a busy neighborhood route. Please inspect the location and make the area safe for pedestrians.',category:CATEGORIES[[0,1,2,3,4,0,1,2][(j+w.id)%titles.length]],ward:w.id,lat:w.lat+(j%3-1)*.0004,lng:w.lng+(j%2)*.0003,reporter:'resident',createdAt,status,photo:null,simulated:true,round:1,votes:status==='Closed'?[{actor:'arjun',confirmed:true},{actor:'sana',confirmed:true}]:[],fixNote:status==='Closed'||status==='Awaiting verification'?'Repair completed and area cleared. Ready for a neighborhood check.':'',fixPhoto:null,fixedAt:status==='Closed'||status==='Awaiting verification'?fixedAt:null,closedAt};
   s.complaints.push(c);await append(s,id,'Reported','resident',createdAt,'Simulated seed report');
   if(status!=='Reported')await append(s,id,'In progress','staff',new Date(+new Date(createdAt)+86400000).toISOString());
   if(c.fixedAt)await append(s,id,'Awaiting verification','staff',fixedAt,'Simulated repair');
@@ -77,3 +77,4 @@ export async function mutate(s,action,body,actor,now=new Date()){
  }
  throw new AppError('Unknown action.',404);
 }
+
